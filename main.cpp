@@ -40,28 +40,40 @@ void printArr(vector<int>xArr,vector<int>yArr){
 
 void positionLooper(vector<int>xArr,vector<int>yArr){
     //loops through both arrays - setting cursor to each inputted position!
+
+    //create a restart button to sidestep the issue of the clicking turning to non clicking
     while(1){
+        //std::this_thread::sleep_for(std::chrono::seconds(1));
         for(int i=0;i<xArr.size();i++){
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            //edit time here
+
             cout << i << endl;
             SetCursorPos(xArr[i],yArr[i]);
 
-            //left click is weird investigate why it disrupts the positioning in the game browser
-            //for(int x = 0;x<10;x++){
-            //    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-            //}
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 
-            if(GetKeyState('P')){
+            for(int x = 0;x<40;x++){
+                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+            if(GetKeyState('E') & 0x8000){
                 cout << "end program";
                 exit(EXIT_FAILURE);
             }
+            else if(GetKeyState('R') & 0x8000){
+                cout << "*****\nTemporary hold please enter y to continue\nenter y: ";
+                string enterToContinue = "";
+                cin >> enterToContinue;
+                if(enterToContinue=="y"){
+                    SetCursorPos(1145,803);
+                    SetCursorPos(1145,802);
+                    continue;
+                }
+
+            }
             else{
-                cout << "continue" << endl;
+                cout << "Hold the E button to exit the program" << endl;
             }
         }
     }
@@ -79,12 +91,19 @@ int main(){
     char areYouReadyKids = 'x';
     //boolean first click so that the weird bug you get when you start the program goes away!
 
-    cout << "enter x into console when you are ready to start" << endl;
+    cout << "enter y into console when you are ready to start" << endl;
     cin >> areYouReadyKids;
-    if(areYouReadyKids == 'x'){
+    if(areYouReadyKids == 'y'){
+        cout << "Hold the C button and click to indicate you are done with mouse positions" << endl;
         cout << "next left click will be recorded" << endl;
+
+        if(keyPressed(VK_LBUTTON)){
+            cout << "you left clicked too early! - click not recorded!" << endl;
+        }
+
         while(1){
             if(keyPressed(VK_LBUTTON)){
+
                 x = pos1x();
                 y = pos1y();
                 cout << x << " --- " << y << " " << endl;
@@ -93,15 +112,23 @@ int main(){
                 yArr.push_back(y);
 
                 if(GetKeyState('C')){
-                    cout << "Print array (you pressed X)" << endl;
-                    xArr.pop_back();
-                    yArr.pop_back();
-                    printArr(xArr,yArr);
+                    cout << "Print array (you pressed C)" << endl;
+                    if(xArr.size() != 0){
+                        xArr.pop_back();
+                        yArr.pop_back();
+                        printArr(xArr,yArr);
+                    }
+                    else{
+                        cout << "--- your array is nothing! --- \n";
+                    }
 
-                    cout << "Do you want to loop this array?" << endl;
+                    cout << "Do you want to loop this array (y/n)?" << endl;
                     cin >> continueQuestion;
                     if(continueQuestion=='y'){
                         positionLooper(xArr,yArr);
+                    }
+                    else if(continueQuestion = 'n'){
+                        exit(EXIT_FAILURE);
                     }
                 }
 
